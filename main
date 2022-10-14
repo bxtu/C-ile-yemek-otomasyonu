@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+
+struct Node 
+{
+	char *YemekIsim;
+	int YemekGramaji;
+	float YemekFiyati;
+	struct Node *sonraki;
+	
+};
+Node *ilk=NULL, *son=NULL, *yeni, *gecicisil, *gecici;
+
+
+
+void ekle(char *y,int g,float f){
+	if(ilk==NULL){
+		ilk=(Node*)malloc(sizeof(Node));
+		ilk->sonraki=NULL;
+		ilk->YemekIsim=y;
+		ilk->YemekGramaji=g;
+		ilk->YemekFiyati=f;
+		
+	}else{
+			if ((ilk->YemekFiyati) > (f)) {
+	            yeni = (Node*) malloc(sizeof (Node));
+	            yeni->YemekIsim=y;
+	            yeni->YemekGramaji = g;
+	            yeni->YemekFiyati = f;
+	            yeni->sonraki = ilk;
+	            ilk = yeni;
+	        } else {
+		gecici=ilk;
+		yeni = (Node*) malloc(sizeof (Node));
+		yeni->YemekIsim=y;
+		yeni->YemekGramaji=g;
+		yeni->YemekFiyati=f;
+		while(gecici!=NULL){
+			if (gecici->sonraki == NULL && (gecici->YemekFiyati) <= (f)) {
+                    yeni->sonraki = NULL;
+                    gecici->sonraki = yeni;
+                    break;
+                }
+                if ((gecici->sonraki->YemekFiyati) > (f)) {
+                    yeni->sonraki = gecici->sonraki;
+                    gecici->sonraki = yeni;
+                    break;
+                }
+                gecici = gecici->sonraki;
+			}
+		}
+	}
+}
+
+void listele() {
+    Node *r=ilk;
+    while (r!= NULL) {
+        printf("%s %d %f\n",r->YemekIsim, r->YemekGramaji, r->YemekFiyati);
+        r = r->sonraki;
+    }
+}
+void dosyadanokuma(){
+	FILE *dosya=fopen("Yemekler.txt","r");
+	char *yemekadi=(char*)malloc(sizeof(char));
+	int *gramaj=(int*)malloc(sizeof(int));
+	float *fiyat=(float*)malloc(sizeof(float));
+	int i=0;
+		while(!feof(dosya)){
+			fscanf(dosya, "%s %d %f", yemekadi,&gramaj[i],&fiyat[i]);
+			ekle(yemekadi,*(gramaj+i),*(fiyat+i));
+			i++;
+}
+}
+void menu() {
+	listele();
+}
+int main() {
+ 
+    
+        
+        dosyadanokuma();
+        menu();
+        
+    
+    return 0;
+}
+ 
+
+
+//listeden aldıklarını herhangi kullanıcı girdisiymiş gibi al!(yarına hatırlatma)
