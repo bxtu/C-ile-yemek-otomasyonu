@@ -1,31 +1,36 @@
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct Node 
 {
-	char *YemekIsim;
+	char YemekIsim[100];
 	int YemekGramaji;
 	float YemekFiyati;
 	struct Node *sonraki;
 	
 };
 Node *ilk=NULL, *son=NULL, *yeni, *gecicisil, *gecici;
+void menu();
+void yemeksecimi();
+void ekranTemizle();
+void silme(char silisim[100]);
 
 
+void ekle(char y[100],int g,float f){
 
-void ekle(char *y,int g,float f){
 	if(ilk==NULL){
 		ilk=(Node*)malloc(sizeof(Node));
 		ilk->sonraki=NULL;
-		ilk->YemekIsim=y;
+		strcpy(ilk->YemekIsim,y);
 		ilk->YemekGramaji=g;
 		ilk->YemekFiyati=f;
 		
 	}else{
 			if ((ilk->YemekFiyati) > (f)) {
 	            yeni = (Node*) malloc(sizeof (Node));
-	            yeni->YemekIsim=y;
+	            strcpy(yeni->YemekIsim,y);
 	            yeni->YemekGramaji = g;
 	            yeni->YemekFiyati = f;
 	            yeni->sonraki = ilk;
@@ -33,7 +38,7 @@ void ekle(char *y,int g,float f){
 	        } else {
 		gecici=ilk;
 		yeni = (Node*) malloc(sizeof (Node));
-		yeni->YemekIsim=y;
+		strcpy(yeni->YemekIsim,y);
 		yeni->YemekGramaji=g;
 		yeni->YemekFiyati=f;
 		while(gecici!=NULL){
@@ -56,36 +61,129 @@ void ekle(char *y,int g,float f){
 void listele() {
     Node *r=ilk;
     while (r!= NULL) {
-        printf("%s %d %f\n",r->YemekIsim, r->YemekGramaji, r->YemekFiyati);
+        printf("\n%s %d %f\n",r->YemekIsim, r->YemekGramaji, r->YemekFiyati);
         r = r->sonraki;
     }
 }
 void dosyadanokuma(){
 	FILE *dosya=fopen("Yemekler.txt","r");
-	char *yemekadi=(char*)malloc(sizeof(char));
+	char yemekadi[100],ad;
 	int *gramaj=(int*)malloc(sizeof(int));
 	float *fiyat=(float*)malloc(sizeof(float));
 	int i=0;
-		while(!feof(dosya)){
+		{
+			while(!feof(dosya)){
 			fscanf(dosya, "%s %d %f", yemekadi,&gramaj[i],&fiyat[i]);
 			ekle(yemekadi,*(gramaj+i),*(fiyat+i));
+
 			i++;
+		}
+
 }
 }
+
 void menu() {
-	listele();
+    int secim, fiyat,gramaj;
+    char *yemekadi=(char*)malloc(sizeof(char));
+ 
+    printf("\n1-Ekleme\n");
+    printf("2-Yemek Secimi\n");
+    printf("3-Listeleme\n");
+    printf("4-Silme\n");
+    printf("5-Cikis\n");
+    scanf("%d", &secim);
+    switch (secim){
+    	case 1:
+    		ekranTemizle();
+    		printf("Yemek adi giriniz: ");
+            scanf("%s", yemekadi);
+            printf("Yemek gramaji giriniz: ");
+            scanf("%d", &gramaj);
+            printf("Yemek fiyati giriniz: ");
+            scanf("%d", &fiyat);
+          	ekle(yemekadi,gramaj,fiyat);
+            break;
+        case 2:
+        	ekranTemizle();
+        	yemeksecimi();
+        	break;
+        case 3:
+        	ekranTemizle();
+        	listele();
+        	break;
+        case 4:
+        	char sil[100];
+        	printf("Silmek istediginiz yemek adini giriniz: ");
+        	scanf("%s",&sil);
+        	silme(sil);
+        	break;
+        case 5:
+        	exit(0);
+        	break;
+	}
+}
+void yemeksecimi(){
+	gecici=ilk;
+	
+	if(gecici==NULL) printf("\nliste bos");
+	char sart[10];
+	printf("Yemek secimi icin e\n Bir sonraki yemege gecmek icin h\n Ana menuye donmek icin a degerini giriniz.\n");
+	
+	while(gecici!=NULL){
+		printf("\n%s %d %f (e/h/a)",gecici->YemekIsim, gecici->YemekGramaji, gecici->YemekFiyati);
+		scanf("%s", &sart);
+		if(strcmp(sart,"e") == 0){
+			printf("\n%s sectiniz.\nSiparisiniz kısa zamanda hazırlanacaktır.\nAfied bal sugar",gecici->YemekIsim);
+			break;
+		}else if(strcmp(sart,"a") == 0){
+			break;
+			}
+			gecici=gecici->sonraki;
+			if(gecici==NULL){
+				gecici=ilk;
+			}
+			
+		}
+	}
+void silme(char silisim[100]){
+	if(ilk==NULL){
+		printf("Silinecek veri yoktur.");
+	}
+	else if(strcmp(ilk->YemekIsim,silisim) == 0){
+		gecicisil=ilk;
+		ilk=ilk->sonraki;
+		free(gecicisil);
+	}else{
+		gecici = ilk;
+        while (gecici->sonraki != NULL) {
+            if (strcmp(gecici->sonraki->YemekIsim,silisim) == 0) {
+                gecicisil = gecici->sonraki;
+                gecici->sonraki = gecicisil->sonraki;
+                free(gecicisil);
+            }else{
+            gecici = gecici->sonraki;
+        	}
+		}
+	}
+
+
 }
 int main() {
- 
+   dosyadanokuma();
     
+        while(1){
+        	menu();
+		}
+      
         
-        dosyadanokuma();
-        menu();
         
     
     return 0;
 }
+ void ekranTemizle() {
+
+    system("cls");
  
 
-
+}
 
